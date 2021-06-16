@@ -1,0 +1,33 @@
+---
+- name: configure web service
+  hosts: centos
+  tasks:
+    - name: this installs {{ web_package }} package
+      yum:
+        name: "{{ web_package }}"
+        state: latest
+
+    - name: this starts {{ web_service }} service
+      service: 
+        name: "{{ web_service }}"
+        enabled: yes
+        state: started
+
+    - name: this creates file
+      copy:
+        dest: /var/www/html/index.html 
+        content: “Welcome to my web server”
+
+    - firewalld:
+        port: 8081/tcp
+        permanent: yes
+        state: enabled
+      notify: 
+        - reload service firewalld
+
+  handlers:
+    - name: reload service firewalld
+      systemd:
+        name: firewalld
+        state: reloaded
+...

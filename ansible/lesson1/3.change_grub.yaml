@@ -1,0 +1,22 @@
+---
+- name: change grub file
+  hosts: centos
+  tasks:
+    - name: this add changes 'biosdevname/net.ifnames' in grub file
+      lineinfile:
+        state: present
+        dest: /etc/default/grub
+        backrefs: yes
+        regexp: '^(GRUB_CMDLINE_LINUX=(?!.* {{ item }})\"[^\"]+)(\".*)'
+        line: '\1 {{ item }}=0\2'
+        backup: yes
+      with_items:
+        - biosdevname
+        - net.ifnames
+      notify:
+        - grub reconfigure
+
+  handlers:
+    - name: grub reconfigure
+      command: grub2-mkconfig -o /boot/grub2/grub.cfg
+...

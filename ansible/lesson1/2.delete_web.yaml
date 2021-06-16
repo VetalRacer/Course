@@ -1,0 +1,27 @@
+---
+- name: configure web service
+  hosts: centos
+  tasks:
+    - name: this deletes {{ web_package }} package
+      yum:
+        name: "{{ web_package }}"
+        state: absent
+
+    - name: this deletes file index.html
+      file:
+        dest: /var/www/html/index.html 
+        state: absent
+
+    - firewalld:
+        port: 8081/tcp
+        permanent: yes
+        state: disabled
+      notify:
+        - reload service firewalld
+
+  handlers:
+    - name: reload service firewalld
+      systemd:
+        name: firewalld
+        state: reloaded
+...
