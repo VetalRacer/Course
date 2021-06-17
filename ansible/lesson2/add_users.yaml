@@ -1,0 +1,15 @@
+---
+- name: add new users
+  hosts: centos
+  vars_files:
+    - vars/users
+  tasks:
+    - name: this add user
+      user:
+        name: "{{ item.value.username }}"
+        state: present
+        comment: "{{ item.value.username }}@example.com"
+        home: /home/{{ item.value.username }}
+        password: "{{ item.value.password | password_hash('sha512') }}"
+        update_password: on_create
+      with_dict: "{{ users }}"
