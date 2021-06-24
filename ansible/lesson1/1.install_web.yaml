@@ -19,7 +19,7 @@
         content: “Welcome to my web server”
 
     - firewalld:
-        port: 8081/tcp
+        port: 80/tcp
         permanent: yes
         state: enabled
       notify: 

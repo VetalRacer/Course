@@ -1,0 +1,7 @@
+---
+- name: configure web service
+  hosts: centos
+
+  roles:
+    - role: install_web
+...
