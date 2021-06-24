@@ -1,0 +1,15 @@
+---
+
+- name: Reload firewalld service
+  systemd:
+    name: firewalld
+    state: reloaded
+
+- name: Reload vsftpd service
+  service:
+    name: vsftpd
+    state: restarted
+
+- name: Apply new SELinux file context to filesystem
+  command: restorecon -irv {{ ftp_path }}
+

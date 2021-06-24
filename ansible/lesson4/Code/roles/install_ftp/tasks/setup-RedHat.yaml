@@ -1,0 +1,12 @@
+---
+- name: this installs vsftpd package
+  yum:
+    name: vsftpd
+    state: latest
+
+- name: this starts vsftpd service
+  service: 
+    name: vsftpd
+    enabled: yes
+    state: started
+...
