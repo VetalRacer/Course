@@ -1,0 +1,65 @@
+---
+# Variable setup
+- name: OS-specific variables.
+  include_vars: "{{ ansible_os_family }}.yaml"
+
+# Setup/install tasks
+- include_tasks: setup-RedHat.yaml
+  when: ansible_os_family == 'RedHat'
+
+# Tasks:
+- name: сreate upload
+  file:
+    path: "{{ ftp_path }}/upload"
+    state: directory
+    owner: ftp
+    group: ftp
+
+- name: install libs for selinux modul
+  yum:
+    name: ['python3-libselinux', 'python3-libsemanage', 'python3-policycoreutils']
+    state: latest
+
+- name: this add changes 'biosdevname/net.ifnames' in grub file
+  lineinfile:
+    state: present
+    dest: /etc/vsftpd/vsftpd.conf
+    backrefs: yes
+    regexp: '^.*{{ item }}=(YES|NO)$'
+    line: '{{ item }}=YES'
+    backup: yes
+  with_items:
+    - anonymous_enable
+    - write_enable
+    - anon_upload_enable
+  notify:
+    - Reload vsftpd service
+
+- name: This change user's home dir
+  user:
+    name: ftp
+    state: present
+    home: "{{ ftp_path }}"
+
+- name: Allow ftp to modify files in "{{ ftp_path }}/upload"
+  sefcontext:
+    target: '{{ ftp_path }}/upload'
+    setype: public_content_rw_t
+    reload: yes
+    state: present
+  notify:
+    - Apply new SELinux file context to filesystem
+    
+- name: Set allow_ftpd_anon_write flag on and keep it persistent across reboots
+  seboolean:
+    name: allow_ftpd_anon_write
+    state: yes
+    persistent: yes
+
+- firewalld:
+    service: ftp
+    permanent: yes
+    state: enabled
+  notify: 
+    - Reload firewalld service
+...
