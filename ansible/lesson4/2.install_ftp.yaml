@@ -1,7 +1,0 @@
----
-- name: configure web service
-  hosts: all
-
-  roles:
-    - role: install_ftp
-...
