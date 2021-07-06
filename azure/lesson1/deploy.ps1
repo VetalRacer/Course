@@ -2,6 +2,7 @@ $vaultName = "lesson1"
 $resourceGroup = "lesson1"
 $location = "westeurope"
 $secretName = "MySecret"
+$secretValue = ConvertTo-SecureString -String '$R3SSkDZ' -AsPlainText -Force
 
 New-AzResourceGroup `
   -Name $resourceGroup `
@@ -13,9 +14,19 @@ New-AzKeyVault `
   -Location $location `
   -EnabledForTemplateDeployment
 
-$secretValue = ConvertTo-SecureString -String 'test' -AsPlainText -Force
-
 Set-AzKeyVaultSecret `
   -VaultName $vaultName `
   -Name $secretName `
   -SecretValue $secretValue
+
+New-AzResourceGroupDeployment `
+  -ResourceGroupName $resourceGroup `
+  -TemplateUri git\Course\azure\lesson1\template.json `
+  -TemplateParameterFile parameters.json
+
+New-AzStorageAccount -ResourceGroupName $resourceGroup `
+  -Name brazhaevcourse `
+  -Location $location `
+  -SkuName Standard_RAGRS `
+  -Kind StorageV2
+
