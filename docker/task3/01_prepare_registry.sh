@@ -14,7 +14,6 @@ docker push localhost:5000/httpd.loc
 
 echo -e "\n\e[1;32mCreate networks...\e[0m \n"
 docker network create 
-#/bin/bash
 
 echo -e "\n\e[1;31m Delete 2tag image...\e[0m \n"
 docker rmi localhost:5000/nginx.loc:latest
