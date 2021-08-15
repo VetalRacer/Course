@@ -1,0 +1,44 @@
+version: '2'
+
+services:
+  nginx:
+    image: localhost:5000/nginx.loc
+    mem_limit: 512m
+    mem_reservation: 128M
+    cpus: 0.5
+    ports:
+      - 8082:8082
+    volumes:
+      - ./static_page:/usr/share/nginx/html
+    networks:
+      nginx_net:
+        ipv4_address: 192.168.52.10
+
+  httpd:
+    image: localhost:5000/httpd.loc
+    mem_limit: 512m
+    mem_reservation: 128M
+    cpus: 0.5
+    ports:
+      - 8083:8083
+    volumes:
+      - ./static_page:/usr/local/apache2/htdocs
+    networks:
+      httpd_net:
+        ipv4_address: 192.168.53.10
+
+networks:
+  nginx_net:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 192.168.52.0/24
+          gateway: 192.168.52.1
+  httpd_net:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 192.168.53.0/24
+          gateway: 192.168.53.1
